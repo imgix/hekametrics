@@ -1,0 +1,30 @@
+{
+	"ImportPath": "github.com/zebrafishlabs/go-metrics-heka",
+	"GoVersion": "go1.2",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go-uuid/uuid",
+			"Comment": "null-12",
+			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
+		},
+		{
+			"ImportPath": "code.google.com/p/goprotobuf/proto",
+			"Comment": "go.r60-150",
+			"Rev": "74b407a42099a47c7cf14dc526472d991ecbd1a3"
+		},
+		{
+			"ImportPath": "github.com/mozilla-services/heka/client",
+			"Comment": "v0.6.0-8-gd4c543d",
+			"Rev": "d4c543d173e8f54819490ec60e92d0ffd291b4ff"
+		},
+		{
+			"ImportPath": "github.com/mozilla-services/heka/message",
+			"Comment": "v0.6.0-8-gd4c543d",
+			"Rev": "d4c543d173e8f54819490ec60e92d0ffd291b4ff"
+		},
+		{
+			"ImportPath": "github.com/rcrowley/go-metrics",
+			"Rev": "1f6faa4de7e71a54cb9edff5dd0f93ad12ba71a7"
+		}
+	]
+}
