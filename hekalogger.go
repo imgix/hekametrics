@@ -31,7 +31,7 @@
 Package hekametrics adds an output for https://github.com/rcrowley/go-metrics/
 
 hekametrics encodes all metrics from a registry into a Heka protobuf message
-and send to a Heka server on a native listener Heka port.
+and sends to a Heka server on it's native listener port.
 */
 package hekametrics
 
