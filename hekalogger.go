@@ -60,7 +60,9 @@ type HekaClient struct {
 }
 
 //NewHekaClient creates and returns a HekaClient
+//
 //connect string like 'tcp://127.0.0.1:5564' and 'udp://127.0.0.1:5564'
+//
 //msgtype sets the 'Type' field on a Heka message
 func NewHekaClient(connect, msgtype string) (hc *HekaClient, err error) {
 	hc = &HekaClient{}
@@ -128,7 +130,9 @@ func (hc *HekaClient) write(b []byte) error {
 }
 
 // LogHeka is a blocking exporter function which encodes and sends metrics to a Heka server
+//
 // all metrics in metrics.Registry r are stored on message.Message.Fields
+//
 // flushing them every Duration d
 func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 
