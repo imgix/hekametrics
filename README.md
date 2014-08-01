@@ -1,7 +1,8 @@
 # hekametrics
 [go-metrics](https://github.com/rcrowley/go-metrics) -> [mozilla heka](https://github.com/mozilla-services/heka)
 
-[godoc](http://godoc.org/github.com/imgix/hekametrics)
+## Documenation
+[Godoc](http://godoc.org/github.com/imgix/hekametrics)
 
 Send a native Heka protobuf with metrics stuffed into its [fields](http://hekad.readthedocs.org/en/v0.6.0/message/index.html) every 4 seconds over UDP or TCP.
 
