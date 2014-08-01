@@ -28,12 +28,11 @@
 # ***** END LICENSE BLOCK *****/
 
 /*
-An output add-on for https://github.com/rcrowley/go-metrics/
+Package hekametrics adds an output for https://github.com/rcrowley/go-metrics/
 
-Encode all metrics from a registry into a Heka protobuf message
+hekametrics encodes all metrics from a registry into a Heka protobuf message
 and send to a Heka server on a native listener Heka port.
 */
-
 package hekametrics
 
 import (
@@ -60,7 +59,9 @@ type HekaClient struct {
 	connect_s *url.URL
 }
 
-//create a new HekaClient, sets the connect string and the Heka Type field for all messages
+//NewHekaClient creates and returns a HekaClient
+//connect string like 'tcp://127.0.0.1:5564' and 'udp://127.0.0.1:5564'
+//msgtype sets the 'Type' field on a Heka message
 func NewHekaClient(connect, msgtype string) (hc *HekaClient, err error) {
 	hc = &HekaClient{}
 	hc.connect_s, err = url.ParseRequestURI(connect)
