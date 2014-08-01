@@ -127,9 +127,9 @@ func (hc *HekaClient) write(b []byte) error {
 
 }
 
-// LogHeka is a blocking exporter function which reports metrics in r
-// using HekaClient settings to connect to and write to Heka server in the native Protobuf format,
-//flushing them every d duration
+// LogHeka is a blocking exporter function which encodes and sends metrics to a Heka server
+// all metrics in metrics.Registry r are stored on message.Message.Fields
+// flushing them every Duration d
 func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 
 	var (
