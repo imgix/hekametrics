@@ -48,7 +48,7 @@ import (
 	"time"
 )
 
-var Logger = log.New(os.Stderr, "[hekametrics]", log.LstdFlags)
+var logger = log.New(os.Stderr, "[hekametrics]", log.LstdFlags)
 
 type HekaClient struct {
 	pid               int32
@@ -69,7 +69,7 @@ func NewHekaClient(connect, msgtype string) (hc *HekaClient, err error) {
 	}
 	switch hc.connect_s.Scheme {
 	case "tcp", "udp":
-		Logger.Println("good boy")
+		logger.Println("good boy")
 	default:
 		return nil, fmt.Errorf("scheme: '%s' not supported, try 'tcp://<host>:<port>' or 'udp://<host>:<port>'", hc.connect_s.Scheme)
 	}
@@ -91,11 +91,11 @@ func (hc *HekaClient) write(b []byte) error {
 			hc.sender = nil
 		}
 
-		Logger.Printf("Connecting: %s\n", hc.connect_s)
+		logger.Printf("Connecting: %s\n", hc.connect_s)
 		hc.sender, e = client.NewNetworkSender(hc.connect_s.Scheme, hc.connect_s.Host)
 		if e != nil {
 			hc.sender = nil
-			Logger.Printf("Err Connecting: %s %v\n", hc.connect_s, e)
+			logger.Printf("Err Connecting: %s %v\n", hc.connect_s, e)
 		}
 		return e
 	}
@@ -110,7 +110,7 @@ func (hc *HekaClient) write(b []byte) error {
 
 	err = hc.sender.SendMessage(b)
 	if err != nil {
-		Logger.Printf("Inject: [error] send message: %s\n", err)
+		logger.Printf("Inject: [error] send message: %s\n", err)
 		err = reconnect()
 		if err != nil {
 			return err
@@ -140,7 +140,7 @@ func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 		msg := make_message(r)
 		msg.SetTimestamp(time.Now().UnixNano())
 		msg.SetUuid(uuid.NewRandom())
-		msg.SetLogger("go-metrics")
+		msg.Setlogger("go-metrics")
 		msg.SetType(hc.msgtype)
 		msg.SetPid(hc.pid)
 		msg.SetSeverity(100)
@@ -149,11 +149,11 @@ func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 
 		err = hc.encoder.EncodeMessageStream(msg, &stream)
 		if err != nil {
-			Logger.Printf("Inject: [error] encode message: %s\n", err)
+			logger.Printf("Inject: [error] encode message: %s\n", err)
 		}
 		err = hc.write(stream)
 		if err != nil {
-			Logger.Printf("Inject: [error] send message: %s\n", err)
+			logger.Printf("Inject: [error] send message: %s\n", err)
 		}
 		time.Sleep(d)
 
@@ -170,14 +170,14 @@ func make_message(r metrics.Registry) *message.Message {
 			n = fmt.Sprintf("%s.%s", pref, n)
 
 			if i+1 > len(vals) {
-				Logger.Println("skipping: %s no value\n", n)
+				logger.Println("skipping: %s no value\n", n)
 				continue
 			}
 			f, e := message.NewField(n, vals[i], "")
 			if e == nil {
 				msg.AddField(f)
 			} else {
-				Logger.Println("skipping: %s %v: %v\n", n, vals[i], e)
+				logger.Println("skipping: %s %v: %v\n", n, vals[i], e)
 			}
 
 		}
@@ -197,7 +197,7 @@ func make_message(r metrics.Registry) *message.Message {
 			if e == nil {
 				msg.AddField(f)
 			} else {
-				Logger.Println("skipping: %s %v: %v\n", name, metric.Value(), e)
+				logger.Println("skipping: %s %v: %v\n", name, metric.Value(), e)
 			}
 
 		case metrics.Histogram:
