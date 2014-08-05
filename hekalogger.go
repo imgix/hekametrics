@@ -72,7 +72,6 @@ func NewHekaClient(connect, msgtype string) (hc *HekaClient, err error) {
 	}
 	switch hc.connect_s.Scheme {
 	case "tcp", "udp":
-		logger.Println("good boy")
 	default:
 		return nil, fmt.Errorf("scheme: '%s' not supported, try 'tcp://<host>:<port>' or 'udp://<host>:<port>'", hc.connect_s.Scheme)
 	}
@@ -145,7 +144,7 @@ func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 		msg := make_message(r)
 		msg.SetTimestamp(time.Now().UnixNano())
 		msg.SetUuid(uuid.NewRandom())
-		msg.Setlogger("go-metrics")
+		msg.SetLogger("go-metrics")
 		msg.SetType(hc.msgtype)
 		msg.SetPid(hc.pid)
 		msg.SetSeverity(100)
