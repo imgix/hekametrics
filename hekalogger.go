@@ -57,6 +57,7 @@ type HekaClient struct {
 	encoder   client.StreamEncoder
 	sender    client.Sender
 	connect_s *url.URL
+	stop      chan struct{}
 }
 
 //NewHekaClient creates and returns a HekaClient
@@ -82,6 +83,7 @@ func NewHekaClient(connect, msgtype string) (hc *HekaClient, err error) {
 	if err != nil {
 		hc.hostname = "<no hostname>"
 	}
+	hc.stop = make(chan struct{})
 	return
 }
 
@@ -123,9 +125,12 @@ func (hc *HekaClient) write(b []byte) error {
 		}
 
 	}
-
 	return err
+}
 
+// Stops LogHeka from another goroutine
+func (hc *HekaClient) Stop() {
+	close(hc.stop)
 }
 
 // LogHeka is a blocking exporter function which encodes and sends metrics to a Heka server
@@ -136,30 +141,35 @@ func (hc *HekaClient) write(b []byte) error {
 func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 
 	var (
-		stream []byte
-		err    error
+		stream  []byte
+		err     error
+		running bool = true
 	)
 
-	for {
-		msg := make_message(r)
-		msg.SetTimestamp(time.Now().UnixNano())
-		msg.SetUuid(uuid.NewRandom())
-		msg.SetLogger("go-metrics")
-		msg.SetType(hc.msgtype)
-		msg.SetPid(hc.pid)
-		msg.SetSeverity(100)
-		msg.SetHostname(hc.hostname)
-		msg.SetPayload("")
+	for running {
+		select {
+		case _, running = <-hc.stop:
+		default:
+			msg := make_message(r)
+			msg.SetTimestamp(time.Now().UnixNano())
+			msg.SetUuid(uuid.NewRandom())
+			msg.SetLogger("go-metrics")
+			msg.SetType(hc.msgtype)
+			msg.SetPid(hc.pid)
+			msg.SetSeverity(100)
+			msg.SetHostname(hc.hostname)
+			msg.SetPayload("")
 
-		err = hc.encoder.EncodeMessageStream(msg, &stream)
-		if err != nil {
-			logger.Printf("Inject: [error] encode message: %s\n", err)
+			err = hc.encoder.EncodeMessageStream(msg, &stream)
+			if err != nil {
+				logger.Printf("Inject: [error] encode message: %s\n", err)
+			}
+			err = hc.write(stream)
+			if err != nil {
+				logger.Printf("Inject: [error] send message: %s\n", err)
+			}
+			time.Sleep(d)
 		}
-		err = hc.write(stream)
-		if err != nil {
-			logger.Printf("Inject: [error] send message: %s\n", err)
-		}
-		time.Sleep(d)
 
 	}
 
