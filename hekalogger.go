@@ -149,26 +149,25 @@ func (hc *HekaClient) LogHeka(r metrics.Registry, d time.Duration) {
 	for running {
 		select {
 		case _, running = <-hc.stop:
-		default:
-			msg := make_message(r)
-			msg.SetTimestamp(time.Now().UnixNano())
-			msg.SetUuid(uuid.NewRandom())
-			msg.SetLogger("go-metrics")
-			msg.SetType(hc.msgtype)
-			msg.SetPid(hc.pid)
-			msg.SetSeverity(100)
-			msg.SetHostname(hc.hostname)
-			msg.SetPayload("")
+		case <-time.After(d):
+		}
+		msg := make_message(r)
+		msg.SetTimestamp(time.Now().UnixNano())
+		msg.SetUuid(uuid.NewRandom())
+		msg.SetLogger("go-metrics")
+		msg.SetType(hc.msgtype)
+		msg.SetPid(hc.pid)
+		msg.SetSeverity(100)
+		msg.SetHostname(hc.hostname)
+		msg.SetPayload("")
 
-			err = hc.encoder.EncodeMessageStream(msg, &stream)
-			if err != nil {
-				logger.Printf("Inject: [error] encode message: %s\n", err)
-			}
-			err = hc.write(stream)
-			if err != nil {
-				logger.Printf("Inject: [error] send message: %s\n", err)
-			}
-			time.Sleep(d)
+		err = hc.encoder.EncodeMessageStream(msg, &stream)
+		if err != nil {
+			logger.Printf("Inject: [error] encode message: %s\n", err)
+		}
+		err = hc.write(stream)
+		if err != nil {
+			logger.Printf("Inject: [error] send message: %s\n", err)
 		}
 
 	}
